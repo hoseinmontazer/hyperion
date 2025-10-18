@@ -17,16 +17,7 @@ Hyperion is a terminal-based TUI (Text User Interface) dashboard for monitoring 
 
 ## Screenshots
 
-```
-+----------------------------------------------------+
-| 🚀 Hyperion vSphere Dashboard                      |
-+----------------------------------------------------+
-| 🎯 Virtual Machines | 🖥️ Hosts | 📊 Usage | 📋 Details |
-| ...                                                |
-+----------------------------------------------------+
-| Footer: Status, controls, last refresh, selected  |
-+----------------------------------------------------+
-```
+![Hyperion Dashboard](./images/dashboard.png)
 
 ---
 
