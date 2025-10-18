@@ -147,7 +147,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 		m.HostList.SetSize(msg.Width-4, msg.Height-10)
 		m.Details.Width = msg.Width - 4
-		m.Details.Height = 8
+		m.Details.Height = msg.Height - 8
 	case TickMsg:
 		m.RefreshData()
 		cmds = append(cmds, Tick())

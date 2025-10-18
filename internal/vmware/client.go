@@ -215,8 +215,15 @@ func GetHostInfo(ctx context.Context, c *govmomi.Client) HostInfo {
 }
 
 type VMInfo struct {
-	Name string
-	IP   string
+	Name      string
+	Host      string
+	Power     string
+	IP        string
+	CPU       int32
+	RAMMB     int32
+	GuestOS   string
+	StorageGB int64
+	Networks  []string
 }
 
 // GetVMInfos returns VM names and IPs
@@ -229,17 +236,40 @@ func GetVMInfos(ctx context.Context, c *govmomi.Client) []VMInfo {
 	defer v.Destroy(ctx)
 
 	var vms []mo.VirtualMachine
-	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"name", "summary"}, &vms)
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"name", "summary", "guest", "config", "storage", "network"}, &vms)
 	if err != nil {
 		log.Fatalf("Failed to retrieve VMs: %v", err)
 	}
 
-	infos := []VMInfo{}
+	var vmInfos []VMInfo
 	for _, vm := range vms {
-		infos = append(infos, VMInfo{
-			Name: vm.Name,
-			IP:   vm.Summary.Guest.IpAddress,
+		// Gather network IPs
+		var ips []string
+		if vm.Guest != nil && vm.Guest.Net != nil {
+			for _, n := range vm.Guest.Net {
+				for _, ip := range n.IpAddress {
+					ips = append(ips, ip)
+				}
+			}
+		}
+
+		// Storage in GB (simple approximation)
+		storageGB := int64(0)
+		if vm.Summary.Storage != nil {
+			storageGB = vm.Summary.Storage.Committed / (1024 * 1024 * 1024)
+		}
+
+		vmInfos = append(vmInfos, VMInfo{
+			Name:      vm.Summary.Config.Name,
+			Power:     string(vm.Summary.Runtime.PowerState),
+			IP:        vm.Summary.Guest.IpAddress,
+			CPU:       int32(vm.Summary.Config.NumCpu),
+			RAMMB:     vm.Summary.Config.MemorySizeMB,
+			GuestOS:   vm.Summary.Config.GuestId,
+			StorageGB: storageGB,
+			Networks:  ips,
 		})
 	}
-	return infos
+
+	return vmInfos
 }
