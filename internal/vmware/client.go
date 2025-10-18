@@ -169,6 +169,7 @@ func GetVMNames(ctx context.Context, c *govmomi.Client) []string {
 
 type HostInfo struct {
 	Name     string
+	IP       string
 	CPUGHz   int32
 	RAMGB    int64
 	CPUUsage int32
@@ -185,7 +186,7 @@ func GetHostInfo(ctx context.Context, c *govmomi.Client) HostInfo {
 	defer v.Destroy(ctx)
 
 	var hosts []mo.HostSystem
-	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"name", "summary"}, &hosts)
+	err = v.Retrieve(ctx, []string{"HostSystem"}, []string{"name", "summary", "config.network.vnic"}, &hosts)
 	if err != nil {
 		log.Fatalf("Failed to retrieve hosts: %v", err)
 	}
@@ -193,12 +194,52 @@ func GetHostInfo(ctx context.Context, c *govmomi.Client) HostInfo {
 	h := hosts[0] // single host
 	cpuGHz := h.Summary.Hardware.CpuMhz * int32(h.Summary.Hardware.NumCpuCores) / 1000
 	memGB := h.Summary.Hardware.MemorySize / (1024 * 1024 * 1024)
+	ip := ""
+	if len(h.Config.Network.Vnic) > 0 {
+		for _, vnic := range h.Config.Network.Vnic {
+			if vnic.Spec.Ip != nil && vnic.Spec.Ip.IpAddress != "" {
+				ip = vnic.Spec.Ip.IpAddress
+				break
+			}
+		}
+	}
 
 	return HostInfo{
 		Name:     h.Summary.Config.Name,
+		IP:       ip,
 		CPUGHz:   cpuGHz,
 		RAMGB:    memGB,
 		CPUUsage: h.Summary.QuickStats.OverallCpuUsage,
 		MemUsage: h.Summary.QuickStats.OverallMemoryUsage / 1024,
 	}
+}
+
+type VMInfo struct {
+	Name string
+	IP   string
+}
+
+// GetVMInfos returns VM names and IPs
+func GetVMInfos(ctx context.Context, c *govmomi.Client) []VMInfo {
+	m := view.NewManager(c.Client)
+	v, err := m.CreateContainerView(ctx, c.ServiceContent.RootFolder, []string{"VirtualMachine"}, true)
+	if err != nil {
+		log.Fatalf("Failed to create container view: %v", err)
+	}
+	defer v.Destroy(ctx)
+
+	var vms []mo.VirtualMachine
+	err = v.Retrieve(ctx, []string{"VirtualMachine"}, []string{"name", "summary"}, &vms)
+	if err != nil {
+		log.Fatalf("Failed to retrieve VMs: %v", err)
+	}
+
+	infos := []VMInfo{}
+	for _, vm := range vms {
+		infos = append(infos, VMInfo{
+			Name: vm.Name,
+			IP:   vm.Summary.Guest.IpAddress,
+		})
+	}
+	return infos
 }

@@ -21,6 +21,20 @@ Hyperion is a terminal-based TUI (Text User Interface) dashboard for monitoring 
 
 ---
 
+## Download
+
+You can download the latest release from the [Releases](https://github.com/yourusername/hyperion/releases) page:
+
+- **Linux:** [hyperion-linux-amd64](https://github.com/yourusername/hyperion/releases/latest/download/hyperion-linux-amd64)  
+- **macOS:** [hyperion-darwin-amd64](https://github.com/yourusername/hyperion/releases/latest/download/hyperion-darwin-amd64)  
+- **Windows:** [hyperion-windows-amd64.exe](https://github.com/yourusername/hyperion/releases/latest/download/hyperion-windows-amd64.exe)
+
+Make sure to mark it as executable on Linux/macOS:
+
+```bash
+chmod +x hyperion-linux-amd64
+
+
 ## Installation
 
 ### Prerequisites

@@ -58,14 +58,13 @@ func (m *Model) RefreshData() {
 
 	for _, hCfg := range m.Cfg.ESXi {
 		client := vmware.ConnectESXI(m.Ctx, hCfg)
-		vms := vmware.GetVMNames(m.Ctx, client)
-
-		// Create VM list for this host
+		vmInfos := vmware.GetVMInfos(m.Ctx, client)
 		vmItems := []list.Item{}
-		for _, vm := range vms {
+		for _, vm := range vmInfos {
 			vmItems = append(vmItems, VMItem{
 				Host: hCfg.Host,
-				Name: vm,
+				Name: vm.Name,
+				IP:   vm.IP,
 			})
 		}
 
@@ -89,11 +88,12 @@ func (m *Model) RefreshData() {
 		hostItems = append(hostItems, HostItem{
 			Name:     h.Name,
 			Host:     hCfg.Host,
+			IP:       h.IP,
 			CPUGHz:   int(h.CPUGHz),
 			RAMGB:    int(h.RAMGB),
 			CPUUsage: int(h.CPUUsage),
 			MemUsage: int(h.MemUsage),
-			VMCount:  len(vms),
+			VMCount:  len(vmInfos),
 		})
 		usage[h.Name] = [2]float64{float64(h.CPUUsage), float64(h.MemUsage)}
 	}

@@ -25,15 +25,17 @@ const (
 type VMItem struct {
 	Host string
 	Name string
+	IP   string
 }
 
 func (i VMItem) Title() string       { return i.Name }
-func (i VMItem) Description() string { return "Host: " + i.Host }
+func (i VMItem) Description() string { return "IP: " + i.IP }
 func (i VMItem) FilterValue() string { return i.Name }
 
 type HostItem struct {
 	Name     string
 	Host     string
+	IP       string
 	CPUGHz   int
 	RAMGB    int
 	CPUUsage int
@@ -46,9 +48,8 @@ func (i HostItem) Title() string {
 }
 
 func (i HostItem) Description() string {
-	return "Host: " + i.Host
+	return "IP: " + i.IP
 }
-
 func (i HostItem) FilterValue() string { return i.Name }
 
 type TickMsg struct{}
