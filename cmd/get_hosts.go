@@ -13,7 +13,7 @@ var getHostsCmd = &cobra.Command{
 	Short: "List all ESXi hosts and resources",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		cfg := vmware.LoadConfig("config/config.yaml")
+		cfg := vmware.LoadConfig()
 
 		for _, host := range cfg.ESXi {
 			client := vmware.ConnectESXI(ctx, host)

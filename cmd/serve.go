@@ -15,7 +15,7 @@ var serveCmd = &cobra.Command{
 	Short: "Launch Hyperion TUI Dashboard",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
-		cfg := vmware.LoadConfig("config/config.yaml")
+		cfg := vmware.LoadConfig()
 
 		m := tui.NewModel(ctx, cfg)
 		p := tea.NewProgram(m, tea.WithAltScreen())
