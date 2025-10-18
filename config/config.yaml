@@ -1,0 +1,15 @@
+# vcenters:
+#   - host: "192.168.1.10"
+#     username: "root"
+#     password_env: "VCENTER_PASS"
+#     insecure: true
+
+esxi:
+  - host: "127.0.0.1:8444"
+    username: "root"
+    password_env: "ESXI1_PASS"
+    insecure: true
+  - host: "127.0.0.1:8445"
+    username: "root"
+    password_env: "ESXI2_PASS"
+    insecure: true
